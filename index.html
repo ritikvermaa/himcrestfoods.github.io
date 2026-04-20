@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HimCrest Foods – Premium dehydrated fruits, veggie snacks & pantry essentials. No preservatives, no added sugar. Clean-label D2C brand." />
+  <meta name="keywords" content="dehydrated fruits, veggie chips, apple chips, mango slices, spinach powder, healthy snacks India" />
+  <meta property="og:title" content="HimCrest Foods – Healthy Snacking Meets Smart Cooking" />
+  <meta property="og:description" content="Premium dehydrated fruits and vegetables from the Himalayas. No sugar, no preservatives. Shop HimCrest Foods today." />
+  <meta property="og:image" content="assets/og-image.jpg" />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="app-extras.css" />
+  <title>HimCrest Foods | Premium Dehydrated Fruits & Veggie Snacks</title>
+
+  <!-- Google Fonts: Playfair Display (headings) + DM Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Firebase SDKs (v9 compat mode – works without Node.js) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+  <!-- Razorpay SDK (loaded async, only on checkout) -->
+  <!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
+</head>
+<body>
+
+  <!-- ─────────────────────────────────────────────────
+       PROMO BAR – top-of-page announcement strip
+  ───────────────────────────────────────────────── -->
+  <div id="promoBar" class="promo-bar">
+    <div class="promo-track">
+      <span>🌿 Free shipping on orders above ₹499</span>
+      <span>✨ Use code <strong>HARVEST10</strong> for 10% off</span>
+      <span>🏔️ Sourced from Himalayan farms – Clean. Pure. Natural.</span>
+      <span>🚚 Pan-India delivery in 3–5 days</span>
+      <span>🌿 Free shipping on orders above ₹499</span>
+      <span>✨ Use code <strong>HARVEST10</strong> for 10% off</span>
+    </div>
+    <button class="promo-close" onclick="document.getElementById('promoBar').style.display='none'">×</button>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────
+       STICKY NAVBAR
+  ───────────────────────────────────────────────── -->
+  <header class="navbar" id="navbar">
+    <div class="nav-container">
+
+      <!-- Hamburger menu (mobile only) -->
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Logo -->
+      <a href="index.html" class="logo">
+        <div class="logo-icon">🏔️</div>
+        <div class="logo-text">
+          <span class="logo-brand">HimCrest Foods</span>
+          <span class="logo-tagline">Clean. Pure. Natural.</span>
+        </div>
+      </a>
+
+      <!-- Search bar -->
+      <div class="search-wrapper">
+        <input type="search" id="searchInput" class="search-input" placeholder="Search fruits, veggies, powders…" autocomplete="off" />
+        <button class="search-btn" id="searchBtn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <!-- Live search dropdown -->
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+
+      <!-- Nav actions -->
+      <div class="nav-actions">
+        <a href="#" class="nav-action" id="wishlistNavBtn" title="Wishlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span class="action-label">Wishlist</span>
+          <span class="badge" id="wishlistCount">0</span>
+        </a>
+        <a href="#" class="nav-action" id="cartNavBtn" title="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="action-label">Cart</span>
+          <span class="badge" id="cartCount">0</span>
+        </a>
+        <div class="nav-action user-menu-trigger" id="userMenuTrigger" title="My Account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="action-label" id="userNavLabel">Login</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category navigation bar -->
+    <nav class="cat-nav" id="catNav">
+      <div class="cat-nav-inner">
+        <a href="#" class="cat-link active" data-cat="all">All</a>
+        <a href="#" class="cat-link" data-cat="fruit-snacks">🍎 Fruit Snacks</a>
+        <a href="#" class="cat-link" data-cat="veggie-snacks">🥦 Veggie Snacks</a>
+        <a href="#" class="cat-link" data-cat="powders">🌿 Powders & Mixes</a>
+        <a href="#" class="cat-link" data-cat="combo">🎁 Combo Packs</a>
+        <a href="#" class="cat-link" data-cat="bestsellers">⭐ Bestsellers</a>
+        <a href="#" class="cat-link" data-cat="new-arrivals">✨ New Arrivals</a>
+        <a href="#" class="cat-link" data-cat="offers">🔥 Offers</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ─────────────────────────────────────────────────
+       MOBILE SLIDE-IN MENU
+  ───────────────────────────────────────────────── -->
+  <div class="mobile-menu-overlay" id="menuOverlay"></div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+      <span class="logo-brand">HimCrest Foods</span>
+      <button class="menu-close" id="menuClose">×</button>
+    </div>
+    <div class="mobile-menu-user" id="mobileUserSection">
+      <div class="avatar-circle">👤</div>
+      <div>
+        <p id="mobileUserName">Welcome, Guest</p>
+        <a href="#" id="mobileLoginBtn" class="btn-link">Login / Signup</a>
+      </div>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="#" data-cat="all">🏠 Home</a></li>
+      <li><a href="#" data-cat="fruit-snacks">🍎 Fruit Snacks</a></li>
+      <li><a href="#" data-cat="veggie-snacks">🥦 Veggie Snacks</a></li>
+      <li><a href="#" data-cat="powders">🌿 Powders & Mixes</a></li>
+      <li><a href="#" data-cat="combo">🎁 Combo Packs</a></li>
+      <li><a href="#" data-cat="bestsellers">⭐ Bestsellers</a></li>
+      <li><a href="#" data-cat="offers">🔥 Offers</a></li>
+      <li><a href="#aboutSection">ℹ️ About Us</a></li>
+      <li><a href="#contactSection">📞 Contact</a></li>
+      <li><a href="#faqSection">❓ FAQ</a></li>
+    </ul>
+    <div class="mobile-menu-footer">
+      <a href="#">Privacy Policy</a> · <a href="#">Terms</a> · <a href="#">Shipping</a>
+    </div>
+  </nav>
+
+  <!-- ─────────────────────────────────────────────────
+       USER DROPDOWN MENU
+  ───────────────────────────────────────────────── -->
+  <div class="user-dropdown" id="userDropdown">
+    <div id="userDropdownContent">
+      <!-- Populated by auth.js based on login state -->
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────
+       MAIN CONTENT AREA
+       All "pages" are sections; JavaScript controls visibility.
+  ───────────────────────────────────────────────── -->
+  <main id="mainContent">
+
+    <!-- ══════════════════════════════════════════
+         HOME PAGE
+    ══════════════════════════════════════════ -->
+    <div id="homePage" class="page active">
+
+      <!-- HERO BANNER SLIDER -->
+      <section class="hero-slider" id="heroSlider">
+        <div class="hero-track" id="heroTrack">
+
+          <div class="hero-slide slide-1">
+            <div class="hero-content">
+              <span class="hero-badge">🌿 100% Natural · No Preservatives</span>
+              <h1 class="hero-heading">Healthy Snacking<br /><em>Meets Smart Cooking</em></h1>
+              <p class="hero-sub">Premium dehydrated fruits, veggie snacks &amp; pantry essentials for modern everyday life.</p>
+              <div class="hero-ctas">
+                <button class="btn btn-primary" onclick="scrollToShop()">Shop Now</button>
+                <button class="btn btn-outline" data-cat="bestsellers" onclick="filterCategory(this)">Explore Bestsellers</button>
+              </div>
+              <div class="hero-trust-pills">
+                <span>✓ No Added Sugar</span>
+                <span>✓ Travel-Friendly</span>
+                <span>✓ Kitchen-Ready</span>
+              </div>
+            </div>
+            <div class="hero-visual">
+              <div class="hero-float-card">
+                <span class="float-emoji">🍎</span>
+                <div>
+                  <strong>Apple Chips</strong>
+                  <p>Crispy · Sweet · Natural</p>
+                </div>
+              </div>
+              <div class="hero-float-card card-2">
+                <span class="float-emoji">🥭</span>
+                <div>
+                  <strong>Mango Slices</strong>
+                  <p>Tangy · Chewy · Tropical</p>
+                </div>
+              </div>
+              <div class="hero-bg-circle"></div>
+            </div>
+          </div>
+
+          <div class="hero-slide slide-2">
+            <div class="hero-content">
+              <span class="hero-badge">🎁 Gift &amp; Discovery Boxes</span>
+              <h1 class="hero-heading">Gift the Goodness<br /><em>of the Himalayas</em></h1>
+              <p class="hero-sub">Curated combo packs and discovery boxes – perfect gifts for health-conscious loved ones.</p>
+              <div class="hero-ctas">
+                <button class="btn btn-primary" data-cat="combo" onclick="filterCategory(this)">Try Combo Packs</button>
+                <button class="btn btn-outline" data-cat="offers" onclick="filterCategory(this)">View Offers</button>
+              </div>
+            </div>
+            <div class="hero-visual">
+              <div class="hero-float-card">
+                <span class="float-emoji">🎁</span>
+                <div>
+                  <strong>Discovery Box</strong>
+                  <p>12 flavours · 1 box</p>
+                </div>
+              </div>
+              <div class="hero-bg-circle" style="background:var(--accent-amber-soft)"></div>
+            </div>
+          </div>
+
+          <div class="hero-slide slide-3">
+            <div class="hero-content">
+              <span class="hero-badge">🏔️ Himalayan Heritage</span>
+              <h1 class="hero-heading">Pure Pantry<br /><em>Essentials</em></h1>
+              <p class="hero-sub">Spinach powder, tomato powder, onion-garlic mix — your kitchen's cleanest secret ingredients.</p>
+              <div class="hero-ctas">
+                <button class="btn btn-primary" data-cat="powders" onclick="filterCategory(this)">Shop Powders</button>
+                <button class="btn btn-outline" onclick="scrollToSection('aboutSection')">Our Story</button>
+              </div>
+            </div>
+            <div class="hero-visual">
+              <div class="hero-float-card">
+                <span class="float-emoji">🌿</span>
+                <div>
+                  <strong>Spinach Powder</strong>
+                  <p>Pure · Potent · Premium</p>
+                </div>
+              </div>
+              <div class="hero-bg-circle" style="background:var(--green-soft)"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slider controls -->
+        <button class="hero-prev" id="heroPrev">‹</button>
+        <button class="hero-next" id="heroNext">›</button>
+        <div class="hero-dots" id="heroDots"></div>
+      </section>
+
+      <!-- TRUST BADGES STRIP -->
+      <section class="trust-strip">
+        <div class="container">
+          <div class="trust-grid">
+            <div class="trust-item">
+              <span class="trust-icon">🔒</span>
+              <div><strong>Secure Payments</strong><p>100% encrypted checkout</p></div>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">🚚</span>
+              <div><strong>Fast Delivery</strong><p>Pan-India in 3–5 days</p></div>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">🌿</span>
+              <div><strong>Clean Ingredients</strong><p>No preservatives, ever</p></div>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">↩️</span>
+              <div><strong>Easy Returns</strong><p>7-day hassle-free policy</p></div>
+            </div>
+            <div class="trust-item">
+              <span class="trust-icon">🏆</span>
+              <div><strong>Premium Quality</strong><p>Himalayan-sourced produce</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SHOP BY CATEGORY CARDS -->
+      <section class="section" id="categoriesSection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Shop by <em>Category</em></h2>
+            <p class="section-subtitle">Wholesome choices for every craving and every kitchen</p>
+          </div>
+          <div class="category-cards">
+            <div class="cat-card" onclick="filterCategory(this)" data-cat="fruit-snacks">
+              <div class="cat-card-icon">🍎</div>
+              <h3>Fruit Snacks</h3>
+              <p>Apple chips, mango slices & mixed bites</p>
+              <span class="cat-arrow">→</span>
+            </div>
+            <div class="cat-card" onclick="filterCategory(this)" data-cat="veggie-snacks">
+              <div class="cat-card-icon">🥦</div>
+              <h3>Veggie Snacks</h3>
+              <p>Beetroot chips, kale crisps & more</p>
+              <span class="cat-arrow">→</span>
+            </div>
+            <div class="cat-card" onclick="filterCategory(this)" data-cat="powders">
+              <div class="cat-card-icon">🌿</div>
+              <h3>Powders & Mixes</h3>
+              <p>Spinach, tomato, onion-garlic & soup mixes</p>
+              <span class="cat-arrow">→</span>
+            </div>
+            <div class="cat-card" onclick="filterCategory(this)" data-cat="combo">
+              <div class="cat-card-icon">🎁</div>
+              <h3>Combo Packs</h3>
+              <p>Discovery boxes & curated gift packs</p>
+              <span class="cat-arrow">→</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BESTSELLERS SECTION -->
+      <section class="section section-tinted" id="bestsellerSection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">⭐ Our <em>Bestsellers</em></h2>
+            <p class="section-subtitle">What thousands of healthy snackers are loving right now</p>
+            <button class="view-all-btn" data-cat="bestsellers" onclick="filterCategory(this)">View All →</button>
+          </div>
+          <div class="product-grid" id="bestsellerGrid">
+            <!-- Product cards injected by products.js -->
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW ARRIVALS SECTION -->
+      <section class="section" id="newArrivalsSection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">✨ New <em>Arrivals</em></h2>
+            <p class="section-subtitle">Fresh additions to our Himalayan pantry</p>
+            <button class="view-all-btn" data-cat="new-arrivals" onclick="filterCategory(this)">View All →</button>
+          </div>
+          <div class="product-grid" id="newArrivalsGrid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OFFERS SECTION -->
+      <section class="section offers-section" id="offersSection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">🔥 Today's <em>Offers</em></h2>
+            <p class="section-subtitle">Limited-time deals on your favourite snacks</p>
+          </div>
+          <div class="offers-grid">
+            <div class="offer-banner offer-banner-1">
+              <div class="offer-text">
+                <span class="offer-tag">FLAT 20% OFF</span>
+                <h3>Veggie Snack Bundles</h3>
+                <p>Use code <strong>VEGGIE20</strong></p>
+                <button class="btn btn-sm btn-white" data-cat="veggie-snacks" onclick="filterCategory(this)">Shop Now</button>
+              </div>
+              <div class="offer-emoji">🥦</div>
+            </div>
+            <div class="offer-banner offer-banner-2">
+              <div class="offer-text">
+                <span class="offer-tag">BUY 2 GET 1</span>
+                <h3>Fruit Snack Fiesta</h3>
+                <p>On all fruit chips & bites</p>
+                <button class="btn btn-sm btn-white" data-cat="fruit-snacks" onclick="filterCategory(this)">Shop Now</button>
+              </div>
+              <div class="offer-emoji">🍎</div>
+            </div>
+            <div class="offer-banner offer-banner-3">
+              <div class="offer-text">
+                <span class="offer-tag">COMBO SAVER</span>
+                <h3>Discovery Box Deal</h3>
+                <p>Save ₹200 on Discovery Box</p>
+                <button class="btn btn-sm btn-white" data-cat="combo" onclick="filterCategory(this)">Shop Now</button>
+              </div>
+              <div class="offer-emoji">🎁</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHY HIMALAYA HARVEST -->
+      <section class="section why-section" id="whySection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Why <em>HimCrest Foods?</em></h2>
+            <p class="section-subtitle">The philosophy behind every bag we pack</p>
+          </div>
+          <div class="why-grid">
+            <div class="why-card reveal-up">
+              <div class="why-icon">🏔️</div>
+              <h4>Himalayan Origins</h4>
+              <p>Sourced from high-altitude farms where clean air and rich soil nurture the purest produce.</p>
+            </div>
+            <div class="why-card reveal-up">
+              <div class="why-icon">🚫</div>
+              <h4>Absolutely No Nasties</h4>
+              <p>Zero preservatives. Zero added sugar. Zero artificial colours. Just pure, dried goodness.</p>
+            </div>
+            <div class="why-card reveal-up">
+              <div class="why-icon">🔬</div>
+              <h4>Lab-Tested Quality</h4>
+              <p>Every batch tested for hygiene and nutrition. Your health is our highest quality standard.</p>
+            </div>
+            <div class="why-card reveal-up">
+              <div class="why-icon">♻️</div>
+              <h4>Sustainable Packaging</h4>
+              <p>Compostable & recyclable packaging. We care for the mountains that feed us.</p>
+            </div>
+            <div class="why-card reveal-up">
+              <div class="why-icon">✈️</div>
+              <h4>Travel & Kitchen Ready</h4>
+              <p>Long shelf life. Lightweight. Perfect for backpacks, lunch boxes, and gourmet kitchens alike.</p>
+            </div>
+            <div class="why-card reveal-up">
+              <div class="why-icon">❤️</div>
+              <h4>Farmer Partnership</h4>
+              <p>We work directly with Himalayan farmers, ensuring fair prices and sustainable livelihoods.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CUSTOMER REVIEWS -->
+      <section class="section section-tinted" id="reviewsHomeSection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">What Our <em>Community Says</em></h2>
+            <p class="section-subtitle">Over 10,000 happy snackers across India</p>
+          </div>
+          <div class="reviews-grid" id="homeReviewsGrid">
+            <!-- Injected by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- INSTAGRAM-STYLE LIFESTYLE SECTION -->
+      <section class="section lifestyle-section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Live the <em>Harvest Life</em></h2>
+            <p class="section-subtitle">Tag us @HimCrestFoods for a chance to be featured</p>
+          </div>
+          <div class="lifestyle-grid">
+            <div class="lifestyle-card" style="background:var(--green-soft)">
+              <span class="lifestyle-emoji">🏔️</span>
+              <p>Morning hike fuel – Apple chips are our trail snack of choice!</p>
+            </div>
+            <div class="lifestyle-card" style="background:var(--amber-soft)">
+              <span class="lifestyle-emoji">🍲</span>
+              <p>Soup Veg Mix in my morning broth – easiest health habit ever.</p>
+            </div>
+            <div class="lifestyle-card" style="background:var(--peach-soft)">
+              <span class="lifestyle-emoji">🎒</span>
+              <p>Packed the Discovery Box for our road trip. Zero regrets!</p>
+            </div>
+            <div class="lifestyle-card" style="background:var(--green-soft)">
+              <span class="lifestyle-emoji">🥗</span>
+              <p>Spinach powder in my smoothie every single morning. So good.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT US SECTION (anchor target) -->
+      <section class="section about-section" id="aboutSection">
+        <div class="container">
+          <div class="about-layout">
+            <div class="about-visual">
+              <div class="about-badge-stack">
+                <div class="about-stat">
+                  <strong>10K+</strong>
+                  <span>Happy Customers</span>
+                </div>
+                <div class="about-stat">
+                  <strong>25+</strong>
+                  <span>Products</span>
+                </div>
+                <div class="about-stat">
+                  <strong>100%</strong>
+                  <span>Natural</span>
+                </div>
+              </div>
+              <div class="about-mountain-art">🏔️</div>
+            </div>
+            <div class="about-content">
+              <span class="section-badge">Our Story</span>
+              <h2 class="section-title">Born in the <em>Himalayas,</em><br />Built for Modern India</h2>
+              <p>HimCrest Foods was born from a simple belief: the mountains give us the cleanest, most nutrient-dense produce on earth. We wanted to bring that purity to your snack drawer and your kitchen.</p>
+              <p>We partner with small-scale Himalayan farmers who grow fruits and vegetables using traditional, chemical-free methods. Our low-temperature dehydration process locks in nutrients, colour, and flavour — without adding a single preservative or artificial ingredient.</p>
+              <p>Whether you're a busy professional snacking between meetings, a parent making healthy lunchboxes, or a home chef adding kitchen magic — HimCrest Foods is your clean-label companion.</p>
+              <div class="about-promises">
+                <span>✓ No added sugar</span>
+                <span>✓ No preservatives</span>
+                <span>✓ No artificial colours</span>
+                <span>✓ Lab tested every batch</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ SECTION -->
+      <section class="section section-tinted" id="faqSection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Frequently Asked <em>Questions</em></h2>
+          </div>
+          <div class="faq-list" id="faqList">
+            <!-- Injected by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- NEWSLETTER SIGNUP -->
+      <section class="newsletter-section">
+        <div class="container">
+          <div class="newsletter-box">
+            <div class="newsletter-content">
+              <h3>🌿 Join the Harvest Community</h3>
+              <p>Get recipes, health tips, and exclusive offers straight to your inbox.</p>
+              <form class="newsletter-form" id="newsletterForm" onsubmit="subscribeNewsletter(event)">
+                <input type="email" placeholder="Your email address" required />
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT SECTION -->
+      <section class="section" id="contactSection">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Get in <em>Touch</em></h2>
+            <p class="section-subtitle">We'd love to hear from you. Our team responds within 24 hours.</p>
+          </div>
+          <div class="contact-layout">
+            <div class="contact-info">
+              <div class="contact-card">
+                <span>📧</span>
+                <div>
+                  <strong>Email Us</strong>
+                  <a href="mailto:hello@himcrestfoods.in" class="support-email-link">hello@himcrestfoods.in</a>
+                </div>
+              </div>
+              <div class="contact-card">
+                <span>💬</span>
+                <div>
+                  <strong>WhatsApp</strong>
+                  <a href="https://wa.me/919876543210" class="whatsapp-link" target="_blank" rel="noopener">+91 98765 43210</a>
+                </div>
+              </div>
+              <div class="contact-card">
+                <span>📍</span>
+                <div>
+                  <strong>Head Office</strong>
+                  <p>HimCrest Foods Foods Pvt. Ltd.<br />Shimla, Himachal Pradesh, India</p>
+                </div>
+              </div>
+              <div class="contact-social">
+                <a href="#" class="social-link social-instagram" target="_blank" rel="noopener">📸 Instagram</a>
+                <a href="#" class="social-link social-facebook" target="_blank" rel="noopener">📘 Facebook</a>
+                <a href="#" class="social-link">YouTube</a>
+              </div>
+            </div>
+            <form class="contact-form" id="contactForm" onsubmit="submitContact(event)">
+              <h4>Send a Message</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Your Name</label>
+                  <input type="text" name="name" placeholder="Rahul Sharma" required />
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" name="email" placeholder="rahul@example.com" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="tel" name="phone" placeholder="+91 98765 43210" />
+                </div>
+                <div class="form-group">
+                  <label>Subject</label>
+                  <select name="subject">
+                    <option>Order Query</option>
+                    <option>Product Inquiry</option>
+                    <option>Return / Refund</option>
+                    <option>Feedback</option>
+                    <option>Wholesale</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Message</label>
+                <textarea name="message" rows="4" placeholder="Tell us how we can help…" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">Send Message 📩</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="site-footer">
+        <div class="container">
+          <div class="footer-grid">
+            <div class="footer-brand">
+              <div class="logo">
+                <div class="logo-icon">🏔️</div>
+                <div class="logo-text">
+                  <span class="logo-brand">HimCrest Foods</span>
+                  <span class="logo-tagline">Clean. Pure. Natural.</span>
+                </div>
+              </div>
+              <p>Premium dehydrated fruits, veggie snacks &amp; pantry essentials. Straight from Himalayan farms to your doorstep.</p>
+              <div class="footer-social">
+                <a href="#" class="social-instagram" target="_blank" rel="noopener" title="Instagram">📸</a>
+                <a href="#" class="social-facebook" target="_blank" rel="noopener" title="Facebook">📘</a>
+                <a href="#" class="whatsapp-link" target="_blank" rel="noopener" title="WhatsApp">💬</a>
+              </div>
+            </div>
+            <div class="footer-links">
+              <h5>Quick Links</h5>
+              <ul>
+                <li><a href="#" data-cat="all" onclick="filterCategory(this)">Shop All</a></li>
+                <li><a href="#" data-cat="bestsellers" onclick="filterCategory(this)">Bestsellers</a></li>
+                <li><a href="#" data-cat="combo" onclick="filterCategory(this)">Combo Packs</a></li>
+                <li><a href="#" data-cat="offers" onclick="filterCategory(this)">Offers</a></li>
+                <li><a href="#aboutSection">About Us</a></li>
+                <li><a href="#contactSection">Contact</a></li>
+              </ul>
+            </div>
+            <div class="footer-links">
+              <h5>Policies</h5>
+              <ul>
+                <li><a href="#" onclick="showPolicyModal('privacy')">Privacy Policy</a></li>
+                <li><a href="#" onclick="showPolicyModal('terms')">Terms &amp; Conditions</a></li>
+                <li><a href="#" onclick="showPolicyModal('shipping')">Shipping Policy</a></li>
+                <li><a href="#" onclick="showPolicyModal('returns')">Return &amp; Refund</a></li>
+                <li><a href="#faqSection">FAQ</a></li>
+              </ul>
+            </div>
+            <div class="footer-links">
+              <h5>Customer Care</h5>
+              <ul>
+                <li><a href="mailto:hello@himcrestfoods.in" class="support-email-link">hello@himcrestfoods.in</a></li>
+                <li><a href="https://wa.me/919876543210">WhatsApp: +91 98765 43210</a></li>
+                <li><a href="#">Track My Order</a></li>
+                <li><a href="#">Cancel Order</a></li>
+                <li><a href="#">Report an Issue</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <p id="footerCopyText">© 2025 HimCrest Foods. All rights reserved. | Made with ❤️ in India</p>
+            <div class="payment-logos">
+              <span>💳 Visa</span>
+              <span>💳 Mastercard</span>
+              <span>📱 UPI</span>
+              <span>📦 COD</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div><!-- /#homePage -->
+
+    <!-- ══════════════════════════════════════════
+         SHOP / PRODUCT LISTING PAGE
+    ══════════════════════════════════════════ -->
+    <div id="shopPage" class="page">
+      <div class="container">
+        <div class="shop-layout">
+
+          <!-- Sidebar Filters -->
+          <aside class="shop-sidebar" id="shopSidebar">
+            <div class="sidebar-section">
+              <h4>Categories</h4>
+              <ul class="filter-list" id="catFilterList">
+                <li><label><input type="radio" name="catFilter" value="all" checked /> All Products</label></li>
+                <li><label><input type="radio" name="catFilter" value="fruit-snacks" /> Fruit Snacks</label></li>
+                <li><label><input type="radio" name="catFilter" value="veggie-snacks" /> Veggie Snacks</label></li>
+                <li><label><input type="radio" name="catFilter" value="powders" /> Powders & Mixes</label></li>
+                <li><label><input type="radio" name="catFilter" value="combo" /> Combo Packs</label></li>
+                <li><label><input type="radio" name="catFilter" value="bestsellers" /> Bestsellers</label></li>
+                <li><label><input type="radio" name="catFilter" value="new-arrivals" /> New Arrivals</label></li>
+                <li><label><input type="radio" name="catFilter" value="offers" /> Offers</label></li>
+              </ul>
+            </div>
+            <div class="sidebar-section">
+              <h4>Price Range</h4>
+              <div class="price-range">
+                <input type="range" id="priceRange" min="0" max="1000" value="1000" step="50" oninput="filterByPrice(this.value)" />
+                <div class="price-range-labels">
+                  <span>₹0</span>
+                  <span id="priceRangeVal">₹1000</span>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-section">
+              <h4>Sort By</h4>
+              <select class="sort-select" id="sortSelect" onchange="sortProducts(this.value)">
+                <option value="default">Relevance</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+                <option value="bestseller">Bestsellers</option>
+              </select>
+            </div>
+          </aside>
+
+          <!-- Product Grid Area -->
+          <div class="shop-main">
+            <div class="shop-header">
+              <h2 id="shopPageTitle">All Products</h2>
+              <div class="shop-controls">
+                <span id="productCount">Loading…</span>
+                <button class="filter-toggle-btn" id="filterToggleBtn">⚙️ Filters</button>
+              </div>
+            </div>
+            <div class="product-grid" id="mainProductGrid">
+              <!-- Products injected by products.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#shopPage -->
+
+    <!-- ══════════════════════════════════════════
+         PRODUCT DETAIL PAGE
+    ══════════════════════════════════════════ -->
+    <div id="productPage" class="page">
+      <div class="container">
+        <nav class="breadcrumb" id="breadcrumb">
+          <a href="#" onclick="showPage('home')">Home</a> ›
+          <a href="#" onclick="showPage('shop')" id="breadcrumbCat">Shop</a> ›
+          <span id="breadcrumbProduct">Product</span>
+        </nav>
+        <div class="product-detail-layout">
+          <!-- Image gallery -->
+          <div class="product-gallery">
+            <div class="gallery-main">
+              <img id="mainProductImg" src="" alt="" class="main-product-img" />
+              <div class="img-zoom-hint">Hover to zoom</div>
+            </div>
+            <div class="gallery-thumbs" id="galleryThumbs"></div>
+          </div>
+          <!-- Product info -->
+          <div class="product-info">
+            <div class="product-labels" id="productLabels"></div>
+            <h1 class="product-title" id="productTitle"></h1>
+            <p class="product-subtitle" id="productSubtitle"></p>
+            <div class="product-rating-bar" id="productRatingBar"></div>
+            <!-- Weight/size variant selector - populated by products.js -->
+            <div class="weight-options" id="weightOptions"></div>
+            <div class="product-saving-badge" id="productSaving" style="color:var(--green-primary);font-weight:600;font-size:14px;margin-top:4px"></div>
+            <div class="product-price-block">
+              <span class="product-price" id="productPrice"></span>
+              <span class="product-mrp" id="productMRP"></span>
+              <span class="product-discount" id="productDiscount"></span>
+            </div>
+            <p class="product-stock" id="productStock"></p>
+            <p class="product-delivery-note" id="productDelivery" style="font-size:13px;color:var(--text-secondary);margin-top:4px">🚚 Ships within 1–2 business days</p>
+            <div class="product-qty-row">
+              <div class="qty-control">
+                <button onclick="changeDetailQty(-1)">−</button>
+                <span id="detailQty">1</span>
+                <button onclick="changeDetailQty(1)">+</button>
+              </div>
+              <button class="btn btn-primary" id="addToCartBtn" onclick="addCurrentToCart()">Add to Cart</button>
+              <button class="btn btn-outline" id="buyNowBtn" onclick="buyNow()">Buy Now</button>
+              <button class="wishlist-btn-detail" id="wishlistDetailBtn" onclick="toggleWishlistDetail()">♡</button>
+            </div>
+            <!-- Product details tabs -->
+            <div class="product-tabs">
+              <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('description', this)">Description</button>
+                <button class="tab-btn" onclick="switchTab('nutrition', this)">Nutrition</button>
+                <button class="tab-btn" onclick="switchTab('how-to', this)">How to Use</button>
+              </div>
+              <div class="tab-content active" id="tab-description"></div>
+              <div class="tab-content" id="tab-nutrition"></div>
+              <div class="tab-content" id="tab-how-to"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reviews section -->
+        <section class="reviews-section">
+          <h3>Customer Reviews</h3>
+          <div class="reviews-summary" id="reviewsSummary"></div>
+          <div class="review-list" id="reviewList"></div>
+          <div class="add-review-box" id="addReviewBox">
+            <h4>Write a Review</h4>
+            <div class="star-selector" id="starSelector">
+              <span onclick="setReviewRating(1)">★</span>
+              <span onclick="setReviewRating(2)">★</span>
+              <span onclick="setReviewRating(3)">★</span>
+              <span onclick="setReviewRating(4)">★</span>
+              <span onclick="setReviewRating(5)">★</span>
+            </div>
+            <textarea id="reviewText" placeholder="Share your experience with this product…"></textarea>
+            <button class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+          </div>
+        </section>
+
+        <!-- Related products -->
+        <section class="related-products">
+          <h3>You May Also Like</h3>
+          <div class="product-grid" id="relatedGrid"></div>
+        </section>
+      </div>
+    </div><!-- /#productPage -->
+
+    <!-- ══════════════════════════════════════════
+         CART PAGE
+    ══════════════════════════════════════════ -->
+    <div id="cartPage" class="page">
+      <div class="container">
+        <h2 class="page-heading">🛒 Your Cart</h2>
+        <div class="cart-layout">
+          <div class="cart-items" id="cartItems">
+            <!-- Injected by cart.js -->
+          </div>
+          <div class="cart-summary">
+            <h4>Order Summary</h4>
+            <div class="summary-row"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div>
+            <div class="summary-row"><span>Shipping</span><span id="cartShipping">FREE</span></div>
+            <div class="summary-row discount-row">
+              <span>Discount</span><span id="cartDiscount">–₹0</span>
+            </div>
+            <div class="coupon-row">
+              <input type="text" id="couponInput" placeholder="Enter coupon code" />
+              <button class="btn btn-sm btn-outline" onclick="applyCoupon()">Apply</button>
+            </div>
+            <p id="cartFreeShipNote" style="font-size:12px;color:var(--green-primary);margin:6px 0;text-align:center"></p>
+            <div class="summary-divider"></div>
+            <div class="summary-row total-row"><span>Total</span><span id="cartTotal">₹0</span></div>
+            <button class="btn btn-primary btn-full" onclick="showPage('checkout')">Proceed to Checkout →</button>
+            <button class="btn btn-outline btn-full" onclick="showPage('shop')" style="margin-top:8px;">Continue Shopping</button>
+            <div class="cart-trust">
+              <span>🔒 Secure Checkout</span>
+              <span>✅ Easy Returns</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#cartPage -->
+
+    <!-- ══════════════════════════════════════════
+         CHECKOUT PAGE
+    ══════════════════════════════════════════ -->
+    <div id="checkoutPage" class="page">
+      <div class="container">
+        <h2 class="page-heading">🔒 Secure Checkout</h2>
+        <div class="checkout-layout">
+          <!-- Address & Payment Form -->
+          <div class="checkout-form-area">
+            <div class="checkout-section">
+              <h4>📍 Delivery Address</h4>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Full Name *</label>
+                  <input type="text" id="co_name" placeholder="Rahul Sharma" required autocomplete="name" />
+                </div>
+                <div class="form-group">
+                  <label>Phone *</label>
+                  <input type="tel" id="co_phone" placeholder="98765 43210" required autocomplete="tel" />
+                </div>
+                <div class="form-group full-width">
+                  <label>Email Address *</label>
+                  <input type="email" id="co_email" placeholder="you@example.com" required autocomplete="email" />
+                </div>
+                <div class="form-group full-width">
+                  <label>Address Line 1 *</label>
+                  <input type="text" id="co_addr1" placeholder="House/Flat No., Street Name" required />
+                </div>
+                <div class="form-group full-width">
+                  <label>Address Line 2</label>
+                  <input type="text" id="co_addr2" placeholder="Landmark (optional)" />
+                </div>
+                <div class="form-group">
+                  <label>City *</label>
+                  <input type="text" id="co_city" placeholder="Delhi" required />
+                </div>
+                <div class="form-group">
+                  <label>State *</label>
+                  <input type="text" id="co_state" placeholder="Delhi" required />
+                </div>
+                <div class="form-group">
+                  <label>PIN Code *</label>
+                  <input type="text" id="co_pin" placeholder="110001" required />
+                </div>
+              </div>
+            </div>
+            <div class="checkout-section">
+              <h4>💳 Payment Method</h4>
+              <div class="payment-methods">
+                <label class="payment-option" onclick="selectPayment('cod')">
+                  <input type="radio" name="payment" value="cod" checked />
+                  <div class="payment-option-content">
+                    <span class="payment-icon">📦</span>
+                    <div>
+                      <strong>Cash on Delivery</strong>
+                      <p>Pay when your order arrives</p>
+                    </div>
+                  </div>
+                </label>
+                <label class="payment-option" onclick="selectPayment('upi')">
+                  <input type="radio" name="payment" value="upi" />
+                  <div class="payment-option-content">
+                    <span class="payment-icon">📱</span>
+                    <div>
+                      <strong>UPI / QR</strong>
+                      <p>GPay, PhonePe, Paytm, BHIM</p>
+                    </div>
+                  </div>
+                </label>
+                <label class="payment-option" onclick="selectPayment('card')">
+                  <input type="radio" name="payment" value="card" />
+                  <div class="payment-option-content">
+                    <span class="payment-icon">💳</span>
+                    <div>
+                      <strong>Credit / Debit Card</strong>
+                      <p>Visa, Mastercard, RuPay</p>
+                    </div>
+                  </div>
+                </label>
+                <label class="payment-option" onclick="selectPayment('netbanking')">
+                  <input type="radio" name="payment" value="netbanking" />
+                  <div class="payment-option-content">
+                    <span class="payment-icon">🏦</span>
+                    <div>
+                      <strong>Net Banking</strong>
+                      <p>All major Indian banks</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <!-- UPI detail (shown when UPI selected) -->
+              <div class="payment-detail" id="upiDetail" style="display:none;">
+                <input type="text" placeholder="Enter UPI ID (e.g. name@upi)" id="upiInput" />
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full btn-lg" onclick="placeOrder()" id="placeOrderBtn">Place Order →</button>
+          </div>
+
+          <!-- Order Summary Sidebar -->
+          <div class="checkout-summary">
+            <h4>Your Order</h4>
+            <div id="checkoutItemList"></div>
+            <div class="summary-divider"></div>
+            <div class="summary-row"><span>Subtotal</span><span id="coSubtotal">₹0</span></div>
+            <div class="summary-row"><span>Shipping</span><span id="coShipping">FREE</span></div>
+            <div class="summary-row discount-row"><span>Coupon Discount</span><span id="coDiscount">–₹0</span></div>
+            <div class="summary-divider"></div>
+            <div class="summary-row total-row"><strong>Total Payable</strong><strong id="coTotal">₹0</strong></div>
+            <div class="checkout-security">
+              <span>🔒 SSL Encrypted</span>
+              <span>✅ 7-Day Returns</span>
+              <span>📦 COD Available</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#checkoutPage -->
+
+    <!-- ══════════════════════════════════════════
+         WISHLIST PAGE
+    ══════════════════════════════════════════ -->
+    <div id="wishlistPage" class="page">
+      <div class="container">
+        <h2 class="page-heading">♡ My Wishlist</h2>
+        <div class="product-grid" id="wishlistGrid"></div>
+        <div class="empty-state" id="wishlistEmpty" style="display:none;">
+          <div class="empty-emoji">♡</div>
+          <h3>Your wishlist is empty</h3>
+          <p>Save products you love for later</p>
+          <button class="btn btn-primary" onclick="showPage('shop')">Explore Products</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         AUTH PAGES (Login / Signup / Forgot)
+    ══════════════════════════════════════════ -->
+    <div id="authPage" class="page">
+      <div class="auth-container">
+        <div class="auth-brand">
+          <div class="logo">
+            <div class="logo-icon">🏔️</div>
+            <div class="logo-text">
+              <span class="logo-brand">HimCrest Foods</span>
+            </div>
+          </div>
+          <p>Your journey to healthy snacking starts here.</p>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div class="auth-card" id="loginForm">
+          <h3>Welcome Back</h3>
+          <p class="auth-sub">Login to your account</p>
+
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="text" id="loginEmail" placeholder="you@example.com" />
+          </div>
+          <div class="form-group password-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" />
+            <button type="button" class="pwd-toggle" onclick="togglePasswordVisibility('loginPassword')">👁</button>
+          </div>
+          <button class="btn btn-primary btn-full" id="loginBtn" onclick="loginUser()">Login</button>
+          <button class="btn btn-google btn-full" onclick="loginWithGoogle()">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+          <p class="auth-link"><a href="#" onclick="switchAuthForm('forgot')">Forgot password?</a></p>
+          <p class="auth-link">Don't have an account? <a href="#" onclick="switchAuthForm('signup')">Sign up</a></p>
+        </div>
+
+
+
+        <!-- SIGNUP FORM -->
+        <div class="auth-card" id="signupForm" style="display:none;">
+          <h3>Create Account</h3>
+          <p class="auth-sub">Create your HimCrest Foods account</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input type="text" id="signupFirst" placeholder="Rahul" autocomplete="given-name" />
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="signupLast" placeholder="Sharma" autocomplete="family-name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Mobile Number * <small>(Indian, 10 digits)</small></label>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="padding:10px 12px;background:var(--surface-alt,#f5f5f5);border:1px solid var(--border-color);border-radius:8px;font-size:14px">🇮🇳 +91</span>
+              <input type="tel" id="signupPhone" placeholder="98765 43210" maxlength="10" autocomplete="tel-national" style="flex:1" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="form-group password-group">
+            <label>Password * <small>(min. 6 characters)</small></label>
+            <input type="password" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password" />
+            <button type="button" class="pwd-toggle" onclick="togglePasswordVisibility('signupPassword')">👁</button>
+          </div>
+          <div class="form-group password-group">
+            <label>Confirm Password *</label>
+            <input type="password" id="signupConfirm" placeholder="Repeat password" autocomplete="new-password" />
+            <button type="button" class="pwd-toggle" onclick="togglePasswordVisibility('signupConfirm')">👁</button>
+          </div>
+          <button class="btn btn-primary btn-full" id="signupSubmitBtn" onclick="signupUser()">Create Account</button>
+          <button class="btn btn-google btn-full" onclick="loginWithGoogle()">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Sign up with Google
+          </button>
+          <p class="auth-link">Already have an account? <a href="#" onclick="switchAuthForm('login')">Login</a></p>
+        </div>
+
+        <!-- EMAIL VERIFICATION SCREEN -->
+        <div class="auth-card" id="verifyEmailForm" style="display:none;">
+          <div style="text-align:center;padding:12px 0 20px">
+            <div style="font-size:3rem;margin-bottom:12px">📧</div>
+            <h3>Verify Your Email</h3>
+            <p class="auth-sub">A verification link has been sent to your email inbox. Click the link, then return here.</p>
+          </div>
+          <div style="background:var(--surface-alt,#f9f9f9);border-radius:10px;padding:16px;margin-bottom:20px;font-size:14px;color:var(--text-secondary)">
+            <strong>Didn't receive it?</strong> Check your spam folder. Still nothing?
+            <a href="#" onclick="resendEmailVerification()" style="color:var(--green-primary);font-weight:600">Resend verification email</a>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="proceedAfterEmailVerification()">
+            ✅ I've verified my email – Continue
+          </button>
+          <p class="auth-link"><a href="#" onclick="switchAuthForm('login')">← Back to Login</a></p>
+        </div>
+
+
+
+        <!-- FORGOT PASSWORD FORM -->
+        <div class="auth-card" id="forgotForm" style="display:none;">
+          <h3>Reset Password</h3>
+          <p class="auth-sub">We'll send a reset link to your email</p>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="resetEmail" placeholder="you@example.com" />
+          </div>
+          <button class="btn btn-primary btn-full" onclick="sendPasswordReset()">Send Reset Link</button>
+          <p class="auth-link"><a href="#" onclick="switchAuthForm('login')">← Back to Login</a></p>
+        </div>
+      </div>
+    </div><!-- /#authPage -->
+
+    <!-- ══════════════════════════════════════════
+         MY ACCOUNT PAGE
+    ══════════════════════════════════════════ -->
+    <div id="accountPage" class="page">
+      <div class="container">
+        <div class="account-layout">
+          <aside class="account-sidebar">
+            <div class="account-avatar">
+              <div class="avatar-lg" id="accountAvatar">👤</div>
+              <h4 id="accountName">User Name</h4>
+              <p id="accountEmail">user@email.com</p>
+            </div>
+            <ul class="account-nav">
+              <li class="active" onclick="switchAccountTab('profile', this)">👤 My Profile</li>
+              <li onclick="switchAccountTab('orders', this)">📦 My Orders</li>
+              <li onclick="switchAccountTab('addresses', this)">📍 Addresses</li>
+              <li onclick="switchAccountTab('wishlist-acc', this)">♡ Wishlist</li>
+              <li onclick="logoutUser()" class="logout-item">🚪 Logout</li>
+            </ul>
+          </aside>
+          <div class="account-content">
+            <!-- Profile Tab -->
+            <div id="tab-profile" class="account-tab active">
+              <h3>My Profile</h3>
+              <div class="profile-form">
+                <div class="form-group"><label>Full Name</label><input type="text" id="profileName" /></div>
+                <div class="form-group">
+                  <label>Email <span id="emailVerifiedStatus" class="badge-red" style="font-size:11px;margin-left:6px;padding:2px 8px;border-radius:99px">⚠️ Not verified</span></label>
+                  <input type="email" id="profileEmail" disabled />
+                </div>
+                <div class="form-group">
+                  <label>Phone <span id="phoneVerifiedStatus" class="badge-red" style="font-size:11px;margin-left:6px;padding:2px 8px;border-radius:99px">⚠️ Not verified</span></label>
+                  <input type="tel" id="profilePhone" />
+                </div>
+                <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+              </div>
+            </div>
+            <!-- Orders Tab -->
+            <div id="tab-orders" class="account-tab">
+              <h3>My Orders</h3>
+              <div id="ordersList"></div>
+            </div>
+            <!-- Addresses Tab -->
+            <div id="tab-addresses" class="account-tab">
+              <h3>Saved Addresses</h3>
+              <div id="addressesList"></div>
+            </div>
+            <!-- Wishlist Tab in Account -->
+            <div id="tab-wishlist-acc" class="account-tab">
+              <h3>My Wishlist</h3>
+              <div class="product-grid" id="accWishlistGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#accountPage -->
+
+    <!-- ══════════════════════════════════════════
+         ORDER SUCCESS PAGE
+    ══════════════════════════════════════════ -->
+    <div id="orderSuccessPage" class="page">
+      <div class="container">
+        <div class="order-success-box">
+          <div class="success-animation">✅</div>
+          <h2>Order Placed Successfully! 🎉</h2>
+          <p>Thank you for choosing HimCrest Foods! Your order is confirmed and will be delivered in 3–5 business days.</p>
+          <div class="order-success-id">
+            Order ID: <strong id="successOrderId"></strong>
+          </div>
+          <div class="order-success-actions">
+            <button class="btn btn-primary" onclick="showPage('account')">View My Orders</button>
+            <button class="btn btn-outline" onclick="showPage('home')">Continue Shopping</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         ADMIN DASHBOARD PAGE
+    ══════════════════════════════════════════ -->
+    <div id="adminPage" class="page">
+      <div class="admin-layout">
+        <!-- Admin Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+          <div class="admin-brand">
+            <span>🏔️</span>
+            <strong>Admin Panel</strong>
+          </div>
+          <ul class="admin-nav">
+            <li class="active" onclick="switchAdminTab('dashboard', this)">📊 Dashboard</li>
+            <li onclick="switchAdminTab('products-admin', this)">📦 Products</li>
+            <li onclick="switchAdminTab('orders-admin', this)">🛒 Orders</li>
+            <li onclick="switchAdminTab('users-admin', this)">👥 Users</li>
+            <li onclick="switchAdminTab('coupons-admin', this)">🏷️ Coupons</li>
+            <li onclick="switchAdminTab('banners-admin', this)">🖼️ Banners</li>
+            <li onclick="switchAdminTab('testimonials-admin', this)">⭐ Testimonials</li>
+            <li onclick="switchAdminTab('faq-admin', this)">❓ FAQs</li>
+            <li onclick="switchAdminTab('contact-admin', this)">📩 Inquiries</li>
+            <li onclick="switchAdminTab('policies-admin', this)">🔏 Policies</li>
+            <li onclick="switchAdminTab('settings-admin', this)">⚙️ Settings</li>
+            <li onclick="exitAdmin()" class="admin-logout">← Exit Admin</li>
+          </ul>
+        </aside>
+
+        <!-- Admin Main Content -->
+        <div class="admin-main">
+          <!-- Dashboard Tab -->
+          <div id="admin-tab-dashboard" class="admin-tab active">
+            <div class="admin-page-header">
+              <h2>Dashboard Overview</h2>
+              <span class="admin-date" id="adminDate"></span>
+            </div>
+            <div class="admin-stats-grid">
+              <div class="admin-stat-card green">
+                <div class="stat-icon">₹</div>
+                <div class="stat-info"><strong id="statRevenue">₹0</strong><span>Total Revenue</span></div>
+              </div>
+              <div class="admin-stat-card blue">
+                <div class="stat-icon">📦</div>
+                <div class="stat-info"><strong id="statOrders">0</strong><span>Total Orders</span></div>
+              </div>
+              <div class="admin-stat-card orange">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info"><strong id="statUsers">0</strong><span>Registered Users</span></div>
+              </div>
+              <div class="admin-stat-card red">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-info"><strong id="statPending">0</strong><span>Pending Orders</span></div>
+              </div>
+              <div class="admin-stat-card purple">
+                <div class="stat-icon">🛍️</div>
+                <div class="stat-info"><strong id="statProducts">0</strong><span>Active Products</span></div>
+              </div>
+              <div class="admin-stat-card yellow">
+                <div class="stat-icon">✅</div>
+                <div class="stat-info"><strong id="statDelivered">0</strong><span>Delivered</span></div>
+              </div>
+            </div>
+            <div class="admin-recent">
+              <div class="admin-recent-card">
+                <h4>Recent Orders</h4>
+                <div id="recentOrdersList"></div>
+              </div>
+              <div class="admin-recent-card">
+                <h4>🔴 Low Stock Alert</h4>
+                <div id="lowStockList"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Admin Tab -->
+          <div id="admin-tab-products-admin" class="admin-tab">
+            <div class="admin-page-header">
+              <h2>Manage Products</h2>
+              <button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>
+            </div>
+            <div class="admin-table-wrapper">
+              <table class="admin-table" id="adminProductTable">
+                <thead>
+                  <tr>
+                    <th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>MRP</th><th>Stock</th><th>Labels</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminProductBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Orders Admin Tab -->
+          <div id="admin-tab-orders-admin" class="admin-tab">
+            <div class="admin-page-header"><h2>Orders</h2></div>
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+                <tbody id="adminOrderBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Users Admin Tab -->
+          <div id="admin-tab-users-admin" class="admin-tab">
+            <div class="admin-page-header"><h2>Users</h2></div>
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Orders</th></tr></thead>
+                <tbody id="adminUserBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Coupons Tab -->
+          <div id="admin-tab-coupons-admin" class="admin-tab">
+            <div class="admin-page-header">
+              <h2>Manage Coupons</h2>
+              <button class="btn btn-primary" onclick="openCouponModal()">+ Add Coupon</button>
+            </div>
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="adminCouponBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Contact Inquiries -->
+          <div id="admin-tab-contact-admin" class="admin-tab">
+            <div class="admin-page-header"><h2>Contact Inquiries</h2></div>
+            <div id="adminContactList"></div>
+          </div>
+
+          <!-- Settings Tab -->
+          <div id="admin-tab-settings-admin" class="admin-tab">
+            <div class="admin-page-header"><h2>Site Settings</h2></div>
+            <div class="settings-grid">
+              <div class="settings-card">
+                <h4>Brand Settings</h4>
+                <div class="form-group"><label>Site Name</label><input type="text" id="settingSiteName" value="HimCrest Foods" /></div>
+                <div class="form-group"><label>Brand Tagline</label><input type="text" id="settingTagline" placeholder="Clean. Pure. Natural." /></div>
+                <div class="form-group"><label>Support Email</label><input type="email" id="settingSupportEmail" placeholder="hello@himcrestfoods.in" /></div>
+                <div class="form-group"><label>Support Phone</label><input type="tel" id="settingSupportPhone" placeholder="+91 98765 43210" /></div>
+                <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="settingWhatsApp" placeholder="+91 98765 43210" /></div>
+              </div>
+              <div class="settings-card">
+                <h4>Social Media Links</h4>
+                <div class="form-group"><label>Instagram URL</label><input type="url" id="settingInstagram" placeholder="https://instagram.com/himcrestfoods" /></div>
+                <div class="form-group"><label>Facebook URL</label><input type="url" id="settingFacebook" placeholder="https://facebook.com/himcrestfoods" /></div>
+              </div>
+              <div class="settings-card">
+                <h4>Contact Address</h4>
+                <div class="form-group"><label>Office Address</label><textarea id="settingContactAddress" rows="3" placeholder="HimCrest Foods, Shimla, Himachal Pradesh, India"></textarea></div>
+              </div>
+              <div class="settings-card">
+                <h4>About Us Content</h4>
+                <div class="form-group"><label>About Us Text (shown on homepage)</label><textarea id="settingAboutUs" rows="5" placeholder="Tell your brand story…"></textarea></div>
+              </div>
+              <div class="settings-card">
+                <h4>Shipping Settings</h4>
+                <div class="form-group"><label>Free Shipping Above (₹)</label><input type="number" id="settingFreeShipping" value="499" /></div>
+                <div class="form-group"><label>Standard Shipping Charge (₹)</label><input type="number" id="settingShippingCharge" value="49" /></div>
+              </div>
+              <div class="settings-card">
+                <h4>Payment Settings</h4>
+                <div class="toggle-setting"><label>COD Enabled</label><input type="checkbox" id="settingCOD" checked /></div>
+                <div class="toggle-setting"><label>Online Payment Enabled</label><input type="checkbox" id="settingOnlinePayment" checked /></div>
+                <div class="toggle-setting"><label>Maintenance Mode</label><input type="checkbox" id="settingMaintenance" /></div>
+              </div>
+              <div class="settings-card">
+                <h4>Razorpay Key</h4>
+                <div class="form-group"><label>Key ID</label><input type="text" id="rzpKey" placeholder="rzp_test_xxxxxxxxxx" /></div>
+                <p class="hint">⚠️ Use test keys in development. Store live keys securely via backend/environment variables in production.</p>
+              </div>
+              <div class="settings-card">
+                <h4>Announcement Bar</h4>
+                <div class="form-group"><label>Bar Text (leave blank to keep default)</label><input type="text" id="settingAnnouncementBar" placeholder="🌿 Free shipping on orders above ₹499 · Use HARVEST10 for 10% off" /></div>
+              </div>
+              <div class="settings-card">
+                <h4>Footer</h4>
+                <div class="form-group"><label>Footer Text</label><input type="text" id="settingFooterText" placeholder="© 2024 HimCrest Foods Foods Pvt. Ltd." /></div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:8px">💾 Save All Settings</button>
+          </div>
+
+          <!-- BANNERS TAB -->
+          <div id="admin-tab-banners-admin" class="admin-tab">
+            <div class="admin-page-header"><h2>Hero Banners</h2></div>
+            <div id="bannerList"><p class="hint">Loading banners…</p></div>
+          </div>
+          <div id="admin-tab-testimonials-admin" class="admin-tab">
+            <div class="admin-page-header"><h2>Testimonials</h2></div>
+            <div id="adminTestimonialList"></div>
+          </div>
+
+          <!-- Policies Tab -->
+          <div id="admin-tab-policies-admin" class="admin-tab">
+            <div class="admin-page-header"><h2>Edit Policies &amp; Pages</h2></div>
+            <p class="hint" style="margin-bottom:16px">Edit your legal pages and about us content. Changes are live immediately on the customer site.</p>
+            <div id="adminPoliciesList"><p class="hint">Loading…</p></div>
+          </div>
+
+          <div id="admin-tab-faq-admin" class="admin-tab">
+            <div class="admin-page-header">
+              <h2>FAQs</h2>
+              <button class="btn btn-primary" onclick="addFAQAdmin()">+ Add FAQ</button>
+            </div>
+            <div id="adminFAQList"></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#adminPage -->
+
+  </main>
+
+  <!-- ─────────────────────────────────────────────────
+       CART DRAWER (slide-in from right)
+  ───────────────────────────────────────────────── -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h4>🛒 Your Cart (<span id="drawerCartCount">0</span>)</h4>
+      <button onclick="closeCartDrawer()">×</button>
+    </div>
+    <div class="cart-drawer-items" id="drawerCartItems"></div>
+    <div class="cart-drawer-footer">
+      <div class="summary-row total-row">
+        <span>Total</span><span id="drawerTotal">₹0</span>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="closeCartDrawer(); showPage('cart')">View Cart & Checkout</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────
+       PRODUCT QUICK VIEW MODAL
+  ───────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="quickViewOverlay" onclick="closeQuickView()"></div>
+  <div class="modal quick-view-modal" id="quickViewModal">
+    <button class="modal-close" onclick="closeQuickView()">×</button>
+    <div class="quick-view-content" id="quickViewContent"></div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────
+       PRODUCT ADMIN MODAL (Add / Edit Product)
+  ───────────────────────────────────────────────── -->
+  <!-- PRODUCT MODAL (URL-based media, no file upload) -->
+  <div class="modal-overlay" id="productModalOverlay" onclick="closeProductModal()"></div>
+  <div class="modal admin-product-modal" id="productModal">
+    <button class="modal-close" onclick="closeProductModal()">×</button>
+    <h3 id="productModalTitle">Add New Product</h3>
+    <div class="pm-modal-scroll">
+      <input type="hidden" id="editProductId" />
+      <div class="pm-grid">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" id="pm_name" placeholder="Apple Chips – Cinnamon Delight" />
+        </div>
+        <div class="form-group">
+          <label>Subtitle / Tagline</label>
+          <input type="text" id="pm_subtitle" placeholder="Crispy · Sweet · 100% Natural" />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="pm_category">
+            <option value="fruit-snacks">🍎 Fruit Snacks</option>
+            <option value="veggie-snacks">🥦 Veggie Snacks</option>
+            <option value="powders">🌿 Powders &amp; Mixes</option>
+            <option value="combo">🎁 Combo Packs</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Emoji (fallback icon)</label>
+          <input type="text" id="pm_emoji" placeholder="🍎" maxlength="4" />
+        </div>
+        <div class="form-group">
+          <label>Price (₹) *</label>
+          <input type="number" id="pm_price" placeholder="199" min="0" />
+        </div>
+        <div class="form-group">
+          <label>MRP / Crossed Price (₹)</label>
+          <input type="number" id="pm_mrp" placeholder="249" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Stock Quantity</label>
+          <input type="number" id="pm_stock" placeholder="100" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Default Weight / Size</label>
+          <input type="text" id="pm_weight" placeholder="100g" />
+        </div>
+        <div class="form-group">
+          <label>Rating (0–5)</label>
+          <input type="number" id="pm_rating" placeholder="4.5" min="0" max="5" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label>Delivery Note</label>
+          <input type="text" id="pm_delivery" placeholder="Ships within 1–2 business days" />
+        </div>
+      </div>
+
+      <!-- MEDIA SECTION -->
+      <div style="background:var(--green-soft,#f0fdf4);border:1.5px solid #86efac;border-radius:10px;padding:16px;margin:16px 0">
+        <h4 style="color:var(--green-primary,#2A5F2E);margin-bottom:4px">📸 Product Images (URL-based)</h4>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">Paste direct image URLs from imgbb, Cloudinary, etc. No file upload needed.</p>
+        <div class="form-group">
+          <label>Main Image URL *</label>
+          <input type="url" id="pm_image" placeholder="https://i.ibb.co/abc123/product.jpg" oninput="previewUrlImage('pm_image','pmImg0Preview')" />
+          <div id="pmImg0Preview" class="pm-img-preview"></div>
+        </div>
+        <div class="pm-grid" style="margin-top:8px">
+          <div class="form-group">
+            <label>Gallery Image 2 (optional)</label>
+            <input type="url" id="pm_image2" placeholder="https://…" oninput="previewUrlImage('pm_image2','pmImg2Preview')" />
+            <div id="pmImg2Preview" class="pm-img-preview"></div>
+          </div>
+          <div class="form-group">
+            <label>Gallery Image 3 (optional)</label>
+            <input type="url" id="pm_image3" placeholder="https://…" oninput="previewUrlImage('pm_image3','pmImg3Preview')" />
+            <div id="pmImg3Preview" class="pm-img-preview"></div>
+          </div>
+          <div class="form-group">
+            <label>Gallery Image 4 (optional)</label>
+            <input type="url" id="pm_image4" placeholder="https://…" oninput="previewUrlImage('pm_image4','pmImg4Preview')" />
+            <div id="pmImg4Preview" class="pm-img-preview"></div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:8px">
+          <label>🎬 Product Video URL (optional)</label>
+          <input type="url" id="pm_video" placeholder="https://… (MP4, WebM or YouTube embed)" oninput="previewUrlVideo('pm_video','pmVideoPreview')" />
+          <div id="pmVideoPreview" class="pm-img-preview"></div>
+        </div>
+      </div>
+
+      <!-- PRODUCT DETAILS -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="pm_description" rows="3" placeholder="Full product description…"></textarea>
+      </div>
+      <div class="pm-grid">
+        <div class="form-group">
+          <label>Ingredients</label>
+          <textarea id="pm_ingredients" rows="2" placeholder="Dehydrated apple (99.5%), cinnamon (0.5%)"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Benefits</label>
+          <textarea id="pm_benefits" rows="2" placeholder="Rich in fibre · Vitamin C…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>How to Use</label>
+          <textarea id="pm_howto" rows="2" placeholder="Enjoy as a snack…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Shelf Life</label>
+          <input type="text" id="pm_shelf" placeholder="12 months from manufacture" />
+        </div>
+        <div class="form-group">
+          <label>Storage Instructions</label>
+          <input type="text" id="pm_storage" placeholder="Store in a cool, dry place" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nutrition Info (JSON)</label>
+        <textarea id="pm_nutrition" rows="3" placeholder='{"Calories":"320 kcal","Protein":"1.5g","Carbs":"76g"}'></textarea>
+      </div>
+      <div class="form-group">
+        <label>Weight Variants (JSON array)</label>
+        <textarea id="pm_variants" rows="4" placeholder='[{"weight":"100g","price":199,"mrp":249,"stock":50},{"weight":"200g","price":369,"mrp":449,"stock":30}]'></textarea>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:2px">Leave empty if product has no variants.</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;margin:12px 0">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="pm_bestseller" /> ⭐ Bestseller</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="pm_newArrival" /> ✨ New Arrival</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="pm_offer" /> 🔥 On Offer</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="pm_outOfStock" /> ❌ Out of Stock</label>
+      </div>
+      <button type="button" class="btn btn-primary btn-full" onclick="saveProductFromModal(event)" style="margin-top:8px">💾 Save Product</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────
+       COUPON ADMIN MODAL
+  ───────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="couponModalOverlay" onclick="closeCouponModal()"></div>
+  <div class="modal admin-coupon-modal" id="couponModal">
+    <button class="modal-close" onclick="closeCouponModal()">×</button>
+    <h3>Add Coupon</h3>
+    <div class="form-group"><label>Code</label><input type="text" id="cm_code" placeholder="HARVEST10" /></div>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="cm_type"><option value="percent">Percentage (%)</option><option value="flat">Flat (₹)</option></select>
+    </div>
+    <div class="form-group"><label>Value</label><input type="number" id="cm_value" /></div>
+    <div class="form-group"><label>Min. Order (₹)</label><input type="number" id="cm_minorder" value="0" /></div>
+    <button class="btn btn-primary btn-full" onclick="saveCoupon()">Save Coupon</button>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────
+       POLICY MODAL
+  ───────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="policyOverlay" onclick="closePolicyModal()"></div>
+  <div class="modal policy-modal" id="policyModal">
+    <button class="modal-close" onclick="closePolicyModal()">×</button>
+    <div id="policyContent"></div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────
+       TOAST NOTIFICATION
+  ───────────────────────────────────────────────── -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ─────────────────────────────────────────────────
+       MOBILE BOTTOM NAVIGATION
+  ───────────────────────────────────────────────── -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <a href="#" onclick="showPage('home')" class="mob-nav-item active" id="mobHome">
+      <span>🏠</span><span>Home</span>
+    </a>
+    <a href="#" onclick="showPage('shop')" class="mob-nav-item" id="mobShop">
+      <span>🛍️</span><span>Shop</span>
+    </a>
+    <a href="#" onclick="openCartDrawer()" class="mob-nav-item" id="mobCart">
+      <span>🛒<sup id="mobCartBadge">0</sup></span><span>Cart</span>
+    </a>
+    <a href="#" onclick="showPage('wishlist')" class="mob-nav-item" id="mobWishlist">
+      <span>♡</span><span>Wishlist</span>
+    </a>
+    <a href="#" onclick="handleAccountNav()" class="mob-nav-item" id="mobAccount">
+      <span>👤</span><span>Account</span>
+    </a>
+  </nav>
+
+  <!-- ORDER DETAIL MODAL (admin) -->
+  <div class="modal-overlay" id="orderDetailOverlay" style="display:none" onclick="closeOrderDetailModal()"></div>
+  <div class="modal" id="orderDetailModal" style="max-width:560px;max-height:85vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeOrderDetailModal()">×</button>
+    <div id="orderDetailContent"></div>
+  </div>
+
+  <!-- Utility: hidden class for OTP input group -->
+  <style>.hidden{display:none!important}</style>
+
+  <!-- All JS files loaded in correct order -->
+  <script src="firebase.js"></script>
+  <script src="auth.js"></script>
+  <script src="products.js"></script>
+  <script src="cart.js"></script>
+  <script src="checkout.js"></script>
+  <script src="admin.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
